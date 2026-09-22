@@ -1,0 +1,7 @@
+{# Default children list template #}
+{# Variables: children (list), parent_name (str), current_page (str) #}
+<ul class="children-list">
+  {%- for child in children %}
+  <li><a href="{{ child.url | escape }}">{{ child.title | escape }}</a></li>
+  {%- endfor %}
+</ul>

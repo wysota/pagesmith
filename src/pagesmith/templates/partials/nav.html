@@ -1,0 +1,48 @@
+<nav>
+    <div class="nav-container">
+        <a href="{{ urls.home }}" class="logo">{{ site.name }}</a>
+        <div class="nav-menu">
+            <ul class="nav-links">
+                {# Data-driven nav: rendered from data/nav.yaml via partials/nav-item.html. #}
+                {% if data.nav %}
+                    {% for item in data.nav.get('items', []) %}
+                        {% include "partials/nav-item.html" %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+            {% include "partials/language-switcher.html" %}
+        </div>
+        <button class="theme-toggle" aria-label="Toggle theme (dark/light/auto)">
+            <span class="icon-sun">☀️</span>
+            <span class="icon-moon">🌙</span>
+            <span class="icon-auto">🖥️</span>
+        </button>
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+    </div>
+</nav>
+<script>
+    // Mobile menu toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (navToggle) {
+        navToggle.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            navMenu.classList.toggle('open');
+        });
+        
+        // Close menu when a link is clicked
+        const navLinks = navMenu.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navToggle.setAttribute('aria-expanded', 'false');
+                navMenu.classList.remove('open');
+            });
+        });
+    }
+</script>

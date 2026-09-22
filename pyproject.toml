@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pagesmith"
+version = "0.1.0"
+description = "Multi-language static site generator with Jinja2 templates"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Witold Wysota" }]
+dependencies = [
+    "Jinja2>=3.0",
+    "PyYAML>=5.1",
+    "Markdown>=3.3",
+]
+
+[project.optional-dependencies]
+watch = ["watchdog>=2.0"]
+serve = ["livereload>=2.6"]
+all = ["watchdog>=2.0", "livereload>=2.6"]
+docs = ["mkdocs>=1.5"]
+
+[project.scripts]
+pagesmith = "pagesmith.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pagesmith*"]
+
+[tool.setuptools.package-data]
+pagesmith = [
+    "templates/*.html",
+    "templates/partials/*.html",
+    "scaffold/assets/*.svg",
+    "scaffold/assets/css/*.css",
+    "scaffold/assets/js/*.js",
+]

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs (for child pages) -->
+{% if breadcrumbs %}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+        {% for item in breadcrumbs %}
+        <li class="breadcrumb-item">
+            {% if item.url %}
+            <a href="{{ item.url }}">{{ item.title }}</a>
+            {% else %}
+            <span class="breadcrumb-current">{{ item.title }}</span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+{% endif %}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-container">
+        <h1>{{ page.title }}</h1>
+        {% if page.subtitle %}
+        <p class="subtitle">{{ page.subtitle | safe }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Page Content -->
+<section class="page-section">
+    <div class="container">
+        {% if metadata.tags %}
+        <div class="post-tags">
+            <strong>{{ t.taxonomy.tags }}:</strong>
+            {% for tag in metadata.tags %}
+            <a href="{{ urls.tags }}{{ tag | slugify }}/" class="tag-link">{{ tag }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if metadata.categories %}
+        <div class="post-categories">
+            <strong>{{ t.taxonomy.categories }}:</strong>
+            {% for cat in metadata.categories %}
+            <a href="{{ urls.categories }}{{ cat | slugify }}/" class="category-link">{{ cat }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <article class="post-content">
+            {{ page.content | safe }}
+        </article>
+    </div>
+</section>
+
+<!-- Child Pages (for parent pages) -->
+{% if children and page.show_related_pages %}
+<section class="children-section">
+    <div class="container">
+        <h2>{{ t.ui.related_pages | default('Related Pages') }}</h2>
+        <div class="children-grid">
+            {% for child in children %}
+            <div class="child-card">
+                <h3><a href="{{ child.url }}">{{ child.title }}</a></h3>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

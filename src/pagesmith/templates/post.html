@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+<!-- Post Header -->
+<div class="page-header">
+    <div class="page-header-container">
+        <h1>{{ page.title }}</h1>
+        <div class="post-meta">
+            {% if page.date %}<span class="post-date">{{ page.date }}</span>{% endif %}
+            {% if page.author %}<span class="post-author">{{ page.author }}</span>{% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Post Content -->
+<section style="padding: 80px 40px;">
+    <div class="container">
+        {% if metadata.tags %}
+        <div class="post-tags" style="margin-bottom: 20px;">
+            <strong>{{ t.taxonomy.tags }}:</strong>
+            {% for tag in metadata.tags %}
+            <a href="{{ urls.tags }}{{ tag | slugify }}/" class="tag-link">{{ tag }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if metadata.categories %}
+        <div class="post-categories" style="margin-bottom: 20px;">
+            <strong>{{ t.taxonomy.categories }}:</strong>
+            {% for cat in metadata.categories %}
+            <a href="{{ urls.categories }}{{ cat | slugify }}/" class="category-link">{{ cat }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <article class="post-content">
+            {{ page.content | safe }}
+        </article>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{# Renders a single navigation item from a data-driven nav list (data/nav.yaml).
+
+   Expected per-item keys (see a site's data/nav.yaml):
+     - name:  URL key; also used for the active state (current_page) and, by
+              default, for the translation label t.nav.<name>.
+     - label: OPTIONAL dot-path into the translations dict, e.g. "taxonomy.tags".
+              Overrides the default t.nav.<name> label, so translated labels can
+              be reused outside the t.nav.* section (e.g. taxonomy headings).
+
+   Used by: partials/nav.html — the list template that loops over data.nav.items
+   and includes this partial per entry. This list-driven pattern (data document +
+   loop template + item partial) is generic: the same approach can drive other
+   menus/link lists (footers, sidebars, etc.).
+#}
+{% if item.label is defined %}
+    {% set ns = namespace(node=t) %}
+    {% for part in item.label.split('.') %}{% set ns.node = ns.node[part] %}{% endfor %}
+    {% set label = ns.node %}
+{% else %}
+    {% set label = t.nav[item.name] %}
+{% endif %}
+{# The home page identifier is 'index' while its URL key is 'home', so the
+   home item is also active on index pages. #}
+<li><a href="{{ urls[item.name] }}" {% if current_page == item.name or (item.name == 'home' and current_page == 'index') %}class="active"{% endif %}>{{ label }}</a></li>

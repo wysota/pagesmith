@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-container">
+        <h1>{{ t.nav.blog }}</h1>
+        <p>{{ t.ui.contact_cta }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <section>
+        {% if posts %}
+        <ul class="blog-posts-list">
+            {% for post in posts %}
+            <li class="blog-post-item">
+                <div class="blog-post-meta">
+                    {{ post.date }}{% if post.author %} — {{ post.author }}{% endif %}
+                </div>
+                <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
+                {% if post.excerpt %}
+                <div class="blog-post-excerpt">
+                    {{ post.excerpt | safe }}
+                </div>
+                <p><a href="{{ post.url }}">{{ t.ui.read_more }} →</a></p>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        {% if pagination %}
+        <nav class="pagination" aria-label="Blog post pagination">
+            {% if pagination.has_prev %}
+                <a href="{{ pagination.prev_url }}" rel="prev">← {{ t.ui.previous_page }}</a>
+            {% endif %}
+
+            {% for page_num in range(1, pagination.total_pages + 1) %}
+                {% if page_num == pagination.current_page %}
+                    <span class="active">{{ page_num }}</span>
+                {% else %}
+                    {% if page_num == 1 %}
+                        <a href="{{ urls.blog }}/">{{ page_num }}</a>
+                    {% else %}
+                        <a href="{{ urls.blog }}/page/{{ page_num }}/">{{ page_num }}</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+                <a href="{{ pagination.next_url }}" rel="next">{{ t.ui.next_page }} →</a>
+            {% endif %}
+        </nav>
+        {% endif %}
+        {% else %}
+        <p>{{ t.ui.no_posts }}</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

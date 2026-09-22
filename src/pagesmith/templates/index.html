@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}{{ hero.title }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>{{ hero.title }}</h1>
+        {% if hero.subtitle %}<p class="subtitle">{{ hero.subtitle }}</p>{% endif %}
+        <a class="button" href="{{ urls.contact }}">{{ t.ui.get_started }}</a>
+    </div>
+</section>
+
+<!-- Services Section -->
+{% if services %}
+<section id="services">
+    <div class="container">
+        <h2>{{ t.ui.our_services }}</h2>
+        <div class="services-grid">
+            {% for service in services %}
+            {% include "partials/service-card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- About Section -->
+{% if about.content %}
+<section id="about">
+    <div class="container">
+        <h2>{{ t.ui.about_us }}</h2>
+        <div class="about-content">
+            <div class="about-text">
+                {{ about.content | safe }}
+                {% if about.expertise %}
+                <ul class="expertise-list">
+                    {% for item in about.expertise %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Skills Section -->
+{% if skills %}
+<section id="skills">
+    <div class="container">
+        <h2>{{ t.ui.technical_expertise }}</h2>
+        <div class="skills-content">
+            {% for skill in skills %}
+            {% include "partials/skill-item.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Contact Section -->
+<section id="contact">
+    <div class="container">
+        <h2>{{ t.ui.lets_work_together }}</h2>
+        {% if t.ui.contact_cta %}<p>{{ t.ui.contact_cta }}</p>{% endif %}
+        <a class="button" href="{{ urls.contact }}">{{ t.nav.contact }}</a>
+    </div>
+</section>
+{% endblock %}
