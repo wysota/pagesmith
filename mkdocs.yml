@@ -1,0 +1,35 @@
+site_name: pagesmith
+site_description: A multi-language static site generator built with Python and Jinja2
+# Set to the real URL when published (used for absolute links/sitemap):
+# site_url: https://pagesmith.example.com/
+docs_dir: docs
+use_directory_urls: true
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quick Start: quickstart.md
+  - CLI Reference: cli.md
+  - Site Structure: site-structure.md
+  - Configuration: configuration.md
+  - Writing Content: content.md
+  - Translations: translations.md
+  - Templates: templates.md
+  - Shortcodes: shortcodes.md
+  - Features: features.md
+  - Deployment: deployment.md
+  - Troubleshooting: troubleshooting.md
+
+markdown_extensions:
+  - admonition
+  - fenced_code
+  - tables
+  - toc:
+      permalink: true
+
+# The old hand-written HTML manual is kept for reference but not published.
+exclude_docs: |
+  _legacy/
