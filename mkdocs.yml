@@ -29,7 +29,3 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
-
-# The old hand-written HTML manual is kept for reference but not published.
-exclude_docs: |
-  _legacy/

@@ -10,7 +10,7 @@ directory** that can live anywhere on disk — it is not tied to the package, an
 generated output can be written to a third location.
 
 ```bash
-pip install pagesmith
+uv tool install 'pagesmith[watch,serve]'
 pagesmith add-site mysite --title "My Site"
 pagesmith build --site-dir mysite
 ```

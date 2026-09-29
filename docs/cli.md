@@ -64,6 +64,11 @@ pagesmith serve --site-dir mysite --host 127.0.0.1 --port 8080
 | `--host` | `0.0.0.0` |
 | `--port` | `8000` |
 
+In live-reload mode the dev server also answers `GET`/`HEAD /health` with
+`200 OK` (body `ok`), which is handy for uptime monitors, proxy health
+checks, or CI that waits on the server to come up — no real `health` file
+is needed in the site output.
+
 ### `watch`
 
 Build once, then rebuild on file changes (content, sections, posts, config,
@@ -269,8 +274,12 @@ The `Makefile` wraps the CLI for the bundled example sites. `SITE=name` defaults
 to `default`.
 
 ```bash
+make install                # uv venv .venv + editable install (watch, serve)
 make build [SITE=name]      make test
 make serve [SITE=name]      make verify
-make watch [SITE=name]      make validate-yaml | check | links
-make add-page NAME=x ...    make status | export
+make watch [SITE=name]      make docs | docs-serve | clean
 ```
+
+`make verify` runs the unit tests plus a throwaway scaffold/build smoke check;
+use `pagesmith validate-yaml`, `check`, and `links` directly for the finer-grained
+checks.

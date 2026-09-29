@@ -19,7 +19,7 @@ try:
     from watchdog.events import FileSystemEventHandler
 except ImportError:
     logging.getLogger(__name__).error("watchdog is required for watch mode")
-    logging.getLogger(__name__).error("Install it with: pip install 'pagesmith[watch]'")
+    logging.getLogger(__name__).error("Install it with: uv tool install 'pagesmith[watch]' (or pip install 'pagesmith[watch]')")
     sys.exit(1)
 
 

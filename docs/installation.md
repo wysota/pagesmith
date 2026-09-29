@@ -3,23 +3,51 @@
 ## Requirements
 
 - **Python 3.9+**
-- `pip`
+- **`uv`** (recommended) or `pip`
 
 `pagesmith` depends on [Jinja2](https://pypi.org/project/Jinja2/),
 [PyYAML](https://pypi.org/project/PyYAML/), and
 [Markdown](https://pypi.org/project/Markdown/). These are installed automatically.
 
-## Install the package
+## Recommended: install with uv
+
+[uv](https://docs.astral.sh/uv/) is the recommended installer. It manages its
+own virtual environments, so it works out of the box even on systems with an
+externally-managed Python (Debian/Ubuntu, recent Homebrew).
 
 ### From PyPI
 
 ```bash
-pip install pagesmith
+uv tool install 'pagesmith[watch,serve]'
 ```
 
-With the optional development extras:
+This installs the `pagesmith` command into an isolated environment managed by
+uv (update it later with `uv tool upgrade pagesmith`).
+
+### From a checkout
 
 ```bash
+git clone <repository-url> pagesmith
+cd pagesmith
+uv venv .venv
+uv pip install -e '.[watch,serve]'
+source .venv/bin/activate
+```
+
+An editable install (`-e`) lets you change the package source and see the
+effect immediately. In the repository, `make install` runs the same steps.
+
+## Alternative: pip in a virtual environment
+
+If you prefer pip, install into a virtual environment first. On distributions
+with an externally-managed Python (Debian/Ubuntu, recent Homebrew) this is
+required — installing into the system Python fails.
+
+### From PyPI
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
 pip install 'pagesmith[watch,serve]'
 ```
 
@@ -28,13 +56,12 @@ pip install 'pagesmith[watch,serve]'
 ```bash
 git clone <repository-url> pagesmith
 cd pagesmith
-pip install -e .
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -e '.[watch,serve]'
 ```
 
-An editable install (`-e`) lets you change the package source and see the
-effect immediately.
-
-### Optional extras
+## Optional extras
 
 | Extra | Adds | Enables |
 |---|---|---|
@@ -45,17 +72,6 @@ effect immediately.
 `pagesmith serve` and `pagesmith watch` still work without their extras: `serve`
 falls back to a plain HTTP server, and `watch` reports a clear error if `watchdog`
 is missing.
-
-## Recommended: use a virtual environment
-
-On distributions with an externally-managed Python (Debian/Ubuntu, recent
-Homebrew), install into a virtual environment:
-
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-pip install pagesmith
-```
 
 ## Optional: Mermaid diagrams
 
@@ -78,12 +94,14 @@ pagesmith --version
 pagesmith --help
 ```
 
-If the command is not found, make sure the directory that `pip` installs
-console scripts into is on your `PATH` (normally handled automatically inside an
-activated virtual environment).
+If the command is not found, make sure the directory that `uv` (or `pip`)
+installs console scripts into is on your `PATH` (normally handled automatically
+for an active uv tool environment or virtual environment).
 
 ## Upgrading
 
 ```bash
-pip install --upgrade pagesmith
+uv tool upgrade pagesmith                          # installed with `uv tool install`
+uv pip install --upgrade 'pagesmith[watch,serve]'  # inside a uv-managed venv
+pip install --upgrade 'pagesmith[watch,serve]'     # inside a pip venv
 ```

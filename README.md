@@ -10,9 +10,42 @@ tool itself.
 
 ## Install
 
+### Recommended: uv
+
+[uv](https://docs.astral.sh/uv/) is the recommended installer. From a checkout:
+
 ```bash
-pip install -e '.[watch,serve]'   # from a checkout
+make install        # uv venv .venv + uv pip install -e '.[watch,serve]'
+source .venv/bin/activate
 pagesmith --version
+```
+
+`make install` creates the project virtual environment (`.venv`) with uv and
+installs pagesmith editable with the `watch` and `serve` extras. Manually, the
+same steps are:
+
+```bash
+uv venv .venv
+uv pip install -e '.[watch,serve]'
+source .venv/bin/activate
+```
+
+To use the `pagesmith` command without a checkout, `uv tool install` works too:
+
+```bash
+uv tool install 'pagesmith[watch,serve]'
+```
+
+### Alternative: pip inside a virtualenv
+
+On distributions with an externally-managed Python (Debian/Ubuntu, recent
+Homebrew), `pip` refuses to install into the system Python. Create a virtualenv
+first:
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -e '.[watch,serve]'
 ```
 
 Runtime dependencies (`Jinja2`, `PyYAML`, `Markdown`) are declared in
@@ -84,8 +117,9 @@ src/pagesmith/                # The installable package
   shortcodes/                 # Built-in shortcode implementations
   scaffold/                   # Files copied into new sites by `add-site`
 tests/                        # Unit tests (stdlib unittest)
+sites/                        # Example sites (default, hero-example)
 docs/                         # User documentation (MkDocs)
-Makefile                      # Thin wrappers: test, verify, docs
+Makefile                      # Thin wrappers around the pagesmith CLI
 ```
 
 ## Key Features
@@ -110,7 +144,8 @@ shortcodes, features, deployment, and troubleshooting.
 Build or preview it locally:
 
 ```bash
-pip install '.[docs]'
+make install                     # uv venv .venv + editable install (watch, serve)
+uv pip install '.[docs]'         # docs extra (mkdocs)
 mkdocs serve     # preview at http://127.0.0.1:8000
 mkdocs build     # write the site to ./site/
 ```
@@ -118,7 +153,7 @@ mkdocs build     # write the site to ./site/
 ## Development
 
 ```bash
-pip install -e .
+make install     # uv venv .venv + editable install (watch, serve)
 make test        # Run unit tests (stdlib unittest)
 make verify      # test + scaffold/build smoke check
 ```
