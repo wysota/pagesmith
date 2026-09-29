@@ -78,7 +78,8 @@ class TestSiteBuilderSmoke(unittest.TestCase):
                 'pl/index.html not generated',
             )
 
-    def test_section_pages_generated(self):
+    def test_no_section_pages_in_minimal_scaffold(self):
+        """The minimal scaffold configures only the index page."""
         output = self.builder.output_dir
         config = self.builder.config
         built = 0
@@ -92,7 +93,8 @@ class TestSiteBuilderSmoke(unittest.TestCase):
                 f'sections/{slug}.html not generated',
             )
             built += 1
-        self.assertGreater(built, 0, 'no section pages configured in scaffolded site')
+        self.assertFalse((output / 'sections').exists(), 'no sections expected')
+        self.assertEqual(built, 0, 'minimal scaffold has no section pages')
 
 
 if __name__ == '__main__':

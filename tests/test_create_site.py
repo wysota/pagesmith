@@ -22,6 +22,14 @@ class TestCreateSite(unittest.TestCase):
     def test_scaffold_layout(self):
         self.assertTrue((self.site / 'config' / 'site.yaml').is_file())
         for rel in [
+            'content/en/index.md',
+            'translations/en.yaml',
+            'assets/css/style.css',
+            'assets/favicon.svg',
+        ]:
+            self.assertTrue((self.site / rel).is_file(), rel)
+        # The minimal scaffold ships no sections, nav data, or extra content.
+        for rel in [
             'content/en/hero.md',
             'content/en/services.md',
             'content/en/about.md',
@@ -29,16 +37,22 @@ class TestCreateSite(unittest.TestCase):
             'sections/en/services.md',
             'sections/en/about.md',
             'sections/en/contact.md',
-            'translations/en.yaml',
-            'assets/css/style.css',
+            'data/nav.yaml',
+            'config/link_schemes.yaml',
             'assets/js/main.js',
-            'assets/favicon.svg',
         ]:
-            self.assertTrue((self.site / rel).is_file(), rel)
+            self.assertFalse((self.site / rel).exists(), rel)
 
-    def test_scaffold_config_has_no_output_dir(self):
+    def test_scaffold_config_is_minimal(self):
         config = paths.load_site_config(self.site)
         self.assertNotIn('output_dir', config['build'])
+        # Only the index page is configured.
+        self.assertEqual(list(config['pages']), ['index'])
+        # Taxonomies are disabled so no extra pages are generated.
+        self.assertFalse(config['taxonomies']['tags']['enabled'])
+        self.assertFalse(config['taxonomies']['categories']['enabled'])
+        # A single Markdown file composes the index page.
+        self.assertEqual(config['pages']['index']['content_files'], ['index.md'])
 
     def test_scaffolded_site_builds_and_is_self_contained(self):
         out = self.root / 'out'
@@ -51,9 +65,11 @@ class TestCreateSite(unittest.TestCase):
         for marker in ('wysota', 'linkedin.com', 'github.com/wysota'):
             self.assertNotIn(marker, index)
 
-        for rel in ['assets/css/style.css', 'sections/about.html',
-                    'sections/contact.html', 'sections/services.html']:
+        # Only the index page and assets are generated.
+        for rel in ['assets/css/style.css', 'assets/favicon.svg']:
             self.assertTrue((out / rel).is_file(), rel)
+        self.assertFalse((out / 'sections').exists(), 'no section pages expected')
+        self.assertFalse((out / 'tags').exists(), 'no taxonomy pages expected')
 
 
 if __name__ == '__main__':

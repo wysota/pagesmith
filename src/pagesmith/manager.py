@@ -18,6 +18,19 @@ from .paths import load_site_config, resolve_output_dir, scaffold_dir
 logger = logging.getLogger(__name__)
 
 
+def _content_file_name(entry):
+    """Return the Markdown filename for an index ``content_files`` entry.
+
+    Entries may be plain strings (``'hero.md'``) or the explicit mapping form
+    (``{'hero': {'file': 'hero.md', 'format': 'hero'}}``); both resolve to the
+    source file name used during the build.
+    """
+    if isinstance(entry, str):
+        return entry
+    name, cfg = next(iter(entry.items()))
+    return cfg.get('file', f'{name}.md')
+
+
 class LinkExtractor(HTMLParser):
     """Extract links from HTML content."""
     
@@ -272,9 +285,10 @@ class SiteManager:
                 return False
             
             for content_file in content_files:
+                filename = _content_file_name(content_file)
                 self._create_translation_stub(
-                    self.content_dir / self.default_lang / content_file,
-                    self.content_dir / target_lang / content_file,
+                    self.content_dir / self.default_lang / filename,
+                    self.content_dir / target_lang / filename,
                     target_lang
                 )
         else:
@@ -654,7 +668,7 @@ Write your post content here.
             # Check homepage content
             if 'index' in self.config['pages']:
                 for content_file in self.config['pages']['index'].get('content_files', []):
-                    content_path = self.content_dir / lang / content_file
+                    content_path = self.content_dir / lang / _content_file_name(content_file)
                     if not content_path.exists():
                         missing.append(str(content_path))
         
@@ -897,44 +911,17 @@ def create_site(name, title=None, base_dir=None):
         'languages': {
             'en': {'name': 'English', 'code': 'en', 'default': True},
         },
-        'build': {
-            'content_dir': 'content',
-            'sections_dir': 'sections',
-            'images_dir': 'images',
-            'permalink': 'posts/:slug',
-            'paginate': True,
-            'posts_per_page': 5,
-        },
         'taxonomies': {
-            'tags': {'singular': 'tag', 'plural': 'tags', 'slug': 'tags', 'enabled': True},
-            'categories': {'singular': 'category', 'plural': 'categories', 'slug': 'categories', 'enabled': True},
+            'tags': {'singular': 'tag', 'plural': 'tags', 'slug': 'tags', 'enabled': False},
+            'categories': {'singular': 'category', 'plural': 'categories', 'slug': 'categories', 'enabled': False},
         },
         'pages': {
-            'index': {'template': 'index.html', 'nav_name': 'HOME', 'content_files': ['hero.md', 'services.md', 'about.md', 'skills.md']},
-            'services': {'template': 'page.html', 'nav_name': 'SERVICES', 'markdown': 'services.md', 'section': True},
-            'about': {'template': 'page.html', 'nav_name': 'ABOUT', 'markdown': 'about.md', 'section': True},
-            'contact': {'template': 'page.html', 'nav_name': 'CONTACT', 'markdown': 'contact.md', 'section': True},
+            'index': {'template': 'index.html', 'content_files': ['index.md']},
         },
     }
     with open(config_dir / 'site.yaml', 'w', encoding='utf-8') as f:
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
     print(f"  Created {config_dir / 'site.yaml'}")
-
-    # Create link_schemes.yaml
-    link_config = {
-        'linker_options': {'link_class': 'code-link', 'skip_existing_links': True, 'verbose': False},
-        'link_schemes': {
-            'qt_class': {
-                'enabled': True,
-                'pattern': '\\\\b(?P<name>Q[A-Z]\\\\w+)\\\\b',
-                'url': 'https://doc.qt.io/qt-6/{name}.html',
-                'transform': {'name': 'name.lower()'},
-            },
-        },
-    }
-    with open(config_dir / 'link_schemes.yaml', 'w', encoding='utf-8') as f:
-        yaml.dump(link_config, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
-    print(f"  Created {config_dir / 'link_schemes.yaml'}")
 
     # Create content directories with language subdirectories
     for subdir in ['content', 'sections', 'posts', 'data', 'images', 'assets', 'translations']:
@@ -958,86 +945,16 @@ def create_site(name, title=None, base_dir=None):
 
     # UI translations used by the shared templates
     translations = {
-        'nav': {
-            'home': 'Home',
-            'services': 'Services',
-            'about': 'About',
-            'contact': 'Contact',
-            'blog': 'Blog',
-        },
         'footer': {'copyright': 'All rights reserved.'},
-        'ui': {
-            'get_started': 'Get Started',
-            'our_services': 'What We Offer',
-            'about_us': 'About Us',
-            'technical_expertise': 'Expertise',
-            'lets_work_together': 'Get in Touch',
-            'contact_cta': 'Have a project in mind? Get in touch.',
-            'read_more': 'Read more',
-            'related_pages': 'Related Pages',
-            'previous_page': 'Previous',
-            'next_page': 'Next',
-            'no_posts': 'No posts yet.',
-        },
-        'taxonomy': {
-            'all_tags': 'All Tags',
-            'all_categories': 'All Categories',
-            'tagged_with': 'Posts tagged with',
-            'in_category': 'Posts in category',
-            'tags': 'Tags',
-            'categories': 'Categories',
-            'no_terms': 'No terms yet.',
-        },
     }
     with open(site_dir / 'translations' / 'en.yaml', 'w', encoding='utf-8') as f:
         yaml.dump(translations, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
     print(f"  Created {site_dir / 'translations' / 'en.yaml'}")
 
-    # Homepage content (index page reads these four files)
-    write_file('content/en/hero.md', f"# {title}\n\nYour tagline goes here.\n")
-    write_file('content/en/services.md', (
-        "- **Service One**: Describe your first service here.\n"
-        "- **Service Two**: Describe your second service here.\n"
-        "- **Service Three**: Describe your third service here.\n"
-    ))
-    write_file('content/en/about.md', (
-        f"# About {title}\n\n"
-        "Write a short introduction to your site here.\n\n"
-        "- First area of expertise\n"
-        "- Second area of expertise\n"
-        "- Third area of expertise\n"
-    ))
-    write_file('content/en/skills.md', (
-        "- **Skill One**: Describe your first skill here.\n"
-        "- **Skill Two**: Describe your second skill here.\n"
-    ))
-
-    # Section pages declared in the config
-    write_file('sections/en/services.md', "# Services\n\nDescribe the services you offer.\n")
-    write_file('sections/en/about.md', "# About\n\nTell your visitors about the site.\n")
-    write_file('sections/en/contact.md', "# Contact\n\nAdd your contact details here.\n")
-
-    # Data-driven navigation (rendered by templates/partials/nav.html via
-    # partials/nav-item.html). Per item: name is the URL key (also used for the
-    # default label t.nav.<name> and current_page active state); label is an
-    # optional dot-path into translations overriding the default label.
-    write_file('data/nav.yaml', (
-        "# Navigation items for this site.\n"
-        "#\n"
-        "# Rendered by templates/partials/nav.html via partials/nav-item.html.\n"
-        "# Per item:\n"
-        "#   - name:  URL key; also the default label key under t.nav.<name> and the\n"
-        "#            current_page value used for the active state.\n"
-        "#   - label: optional dot-path into translations, overriding the default\n"
-        "#            t.nav.<name> label (e.g. taxonomy.tags).\n"
-        "# Order in this file is the order shown in the navigation.\n"
-        "items:\n"
-        "  - name: home\n"
-        "  - name: services\n"
-        "  - name: about\n"
-        "  - name: contact\n"
-        "  - name: tags\n"
-        "    label: taxonomy.tags\n"
+    # Homepage content (a single Markdown file: first heading = title, body = content)
+    write_file('content/en/index.md', (
+        f"# {title}\n\n"
+        "Placeholder content. Edit `content/en/index.md` to change this page.\n"
     ))
 
     print(f"\n Site '{name}' created at {site_dir}")

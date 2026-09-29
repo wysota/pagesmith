@@ -13,11 +13,9 @@ This scaffolds a self-contained site in `./mysite/`:
 ```text
 mysite/
   config/site.yaml
-  config/link_schemes.yaml
-  content/en/{hero,services,about,skills}.md
-  sections/en/{services,about,contact}.md
+  content/en/index.md
   translations/en.yaml
-  assets/{css/style.css,js/main.js,favicon.svg}
+  assets/{css/style.css,favicon.svg}
 ```
 
 Use `--dir` to create it somewhere else:
@@ -61,21 +59,24 @@ pagesmith watch --site-dir mysite
 
 `watch` performs an initial build, then rebuilds whenever content, config,
 translations, or templates change. Requires the `watch` extra
-(`pip install 'pagesmith[watch]'`).
+(`uv tool install 'pagesmith[watch]'` or `pip install 'pagesmith[watch]'`).
 
 ## 5. Edit content
 
-Homepage sections are plain Markdown:
+The homepage is a single Markdown file, `content/en/index.md`:
 
-- `content/en/hero.md` — first non-empty line is the headline, the second is the tagline.
-- `content/en/services.md` and `content/en/skills.md` — cards, one per line:
+- The first `# Heading` becomes the page title.
+- The rest of the body is rendered into the main content area.
 
-  ```markdown
-  - **Card Title**: Card description.
-  ```
+```markdown
+# My Site
 
-- `content/en/about.md` — first line is the title, paragraphs become body text,
-  and `- ` bullets become an expertise list.
+Anything you like — this is the homepage.
+```
+
+To build a homepage from several Markdown files (a hero, cards, an about block…),
+see [Composing a page from multiple Markdown files](content.md#composing-a-page-from-multiple-markdown-files),
+or study the runnable `sites/hero-example/` site in this repository.
 
 Standalone pages live in `sections/en/`. A page titled `# Services` in
 `sections/en/services.md` is published at `sections/services.html`.
@@ -134,10 +135,15 @@ The repository ships example sites under `sites/` and a `Makefile` that wraps th
 CLI. `SITE` selects the site (default `default`):
 
 ```bash
-pip install -e '.[watch,serve]'
+make install            # uv venv .venv + uv pip install -e '.[watch,serve]'
 make build              # pagesmith build --site default
+make build SITE=hero-example   # build the hero-composed example site
 make build SITE=test    # pagesmith build --site test
 make serve SITE=test
 make test
 make verify             # build + tests + config/content/link checks
 ```
+
+`sites/default/` is the minimal starter (one homepage file). `sites/hero-example/`
+is the classic hero landing page, demonstrating a homepage composed from several
+Markdown files plus a per-site `templates/` override and custom assets.
