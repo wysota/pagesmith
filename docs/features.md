@@ -44,6 +44,27 @@ cached (`.mermaid_cache.json`) so unchanged diagrams are not re-rendered. If
 `mmdc` is not installed, Mermaid blocks are skipped with a warning and the rest
 of the site still builds.
 
+## Code highlighting
+
+Fenced code blocks are highlighted with [Pygments](https://pygments.org/). Add a
+language to the fence, or omit it to let Pygments guess:
+
+````markdown
+```python
+def hello():
+    print("world")
+```
+````
+
+The `{% highlight %}` shortcode does the same for code that is awkward to fence
+(see [Shortcodes](shortcodes.md#highlight)). Pygments emits styling hooks (CSS
+classes such as `k`, `nf`, `s2`) rather than inline colors, so add a Pygments
+stylesheet to your site's CSS to see the colors, for example:
+
+```bash
+pygmentize -S default -f html -a .codehilite
+```
+
 ## Code linking
 
 The code-linking plugin turns identifiers in code blocks and inline code into

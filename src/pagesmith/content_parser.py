@@ -134,7 +134,7 @@ class ContentParser:
         html_output = markdown.markdown(processed, extensions=extensions, extension_configs={
             'codehilite': {
                 'css_class': 'codehilite',
-                'guess_lang': False
+                'guess_lang': True
             }
         })
 

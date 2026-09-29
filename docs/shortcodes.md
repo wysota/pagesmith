@@ -36,7 +36,7 @@ Embed an image with an optional caption. `src` is relative to the page.
 
 ## `highlight`
 
-Render an escaped code block with optional language class.
+Render a code block with Pygments syntax highlighting.
 
 ```jinja
 {% highlight lang='python' %}
@@ -44,6 +44,11 @@ def hello():
     print("world")
 {% endhighlight %}
 ```
+
+Pass the language as `lang='...'` (or `language='...'`, or the first positional
+argument). When the language is omitted, Pygments guesses it; if the guess fails
+the block falls back to plain text. Fenced code blocks are highlighted the same
+way.
 
 ## `gist`
 
