@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, Optional, List, Any
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, ChainableUndefined, select_autoescape
 
 from .translation_manager import TranslationManager
 from .plugins.shortcodes import ShortcodeProcessor
@@ -134,6 +134,10 @@ class SiteBuilder:
         self.env = Environment(
             loader=FileSystemLoader([str(self.site_templates_dir), str(self.templates_dir)]),
             autoescape=select_autoescape(['html', 'xml']),
+            # ChainableUndefined: missing keys (e.g. sparse translation files)
+            # resolve to an empty string instead of crashing template rendering,
+            # so templates degrade gracefully when a site omits UI strings.
+            undefined=ChainableUndefined,
             extensions=jinja2_exts if jinja2_exts else [],
         )
         self.env.filters['slugify'] = self.slugify
@@ -292,32 +296,92 @@ class SiteBuilder:
         """Delegate to URL manager."""
         return self.url_manager.get_language_urls(current_page, current_lang, page_type, taxonomy_slug)
     
+    #: Classic file-name -> layout-part mapping kept for backwards compatibility.
+    #: When an index ``content_files`` entry is a plain string, its file stem
+    #: selects the parse mode (hero/cards/about); any other stem renders as full
+    #: Markdown. Sites wanting full control can use the mapping form instead:
+    #: ``name: {file: <name>.md, format: <markdown|hero|cards|about>}``.
+    INDEX_SECTION_FORMATS = {
+        'hero': 'hero',
+        'services': 'cards',
+        'about': 'about',
+        'skills': 'cards',
+    }
+
+    @staticmethod
+    def _resolve_content_entry(entry: Any):
+        """Normalize one index ``content_files`` entry to (name, filename, format).
+
+        Plain string entries use the classic name-based convention; mapping
+        entries (``name: {file: .., format: ..}``) are fully explicit.
+        """
+        if isinstance(entry, str):
+            filename = entry
+            name = Path(filename).stem
+            fmt = SiteBuilder.INDEX_SECTION_FORMATS.get(name, 'markdown')
+            return name, filename, fmt
+        # Mapping form: exactly one ``name: {file, format}`` pair.
+        name, cfg = next(iter(entry.items()))
+        filename = cfg.get('file', f'{name}.md')
+        fmt = cfg.get('format', 'markdown')
+        return name, filename, fmt
+
     def build_index(self, lang):
-        """Build the index page for a specific language."""
+        """Build the index page for a specific language.
+
+        The index page is composed from the Markdown files listed in the
+        ``pages.index.content_files`` config. Each file becomes a template
+        variable named after its file stem (or its mapping key); the first
+        Markdown-format file also provides ``page.title`` and ``page.content``.
+        """
         print(f"  Building index ({lang})...")
-        
-        # Load content
-        hero_md = self.load_content_file('hero.md', lang)
-        services_md = self.load_content_file('services.md', lang)
-        about_md = self.load_content_file('about.md', lang)
-        skills_md = self.load_content_file('skills.md', lang)
-        
-        # Parse content
-        hero = self.extract_hero_parts(hero_md)
-        services = self.extract_cards(services_md)
-        about = self.extract_about_parts(about_md)
-        skills = self.extract_cards(skills_md)
-        
+
+        index_cfg = self.config.get('pages', {}).get('index', {})
+        content_files = index_cfg.get('content_files')
+        if content_files is None:
+            # Backwards-compatible default: the classic hero landing layout.
+            content_files = ['hero.md', 'services.md', 'about.md', 'skills.md']
+
+        sections = {}
+        page_title = None
+        page_content = ''
+
+        for entry in content_files:
+            name, filename, fmt = self._resolve_content_entry(entry)
+            markdown_text = self.load_content_file(filename, lang)
+            if not markdown_text:
+                continue
+
+            if fmt == 'hero':
+                sections[name] = self.extract_hero_parts(markdown_text)
+                if page_title is None and sections[name].get('title'):
+                    page_title = sections[name]['title']
+            elif fmt == 'cards':
+                sections[name] = self.extract_cards(markdown_text)
+            elif fmt == 'about':
+                sections[name] = self.extract_about_parts(markdown_text)
+            else:  # markdown
+                metadata, body = self.parse_metadata(markdown_text)
+                title, body = self.content_parser.extract_title_from_markdown(
+                    body, metadata, fallback=self.config['site']['name']
+                )
+                html = self.markdown_to_html(body, lang=lang, current_page='index')
+                sections[name] = html
+                if page_title is None:
+                    page_title = title
+                    page_content = html
+
+        if page_title is None:
+            page_title = self.config['site']['name']
+
         # Build context with standard variables
         context = self.template_renderer.get_standard_context('index', lang)
         context.update({
-            'page': {'title': hero['title']},
-            'hero': hero,
-            'services': services,
-            'about': about,
-            'skills': skills,
+            'page': {'title': page_title, 'content': page_content},
+            'sections': sections,
+            **sections,  # each section is also available under its own name
         })
-        
+
         # Render and write
         self.template_renderer.render_and_write('index.html', context, 'index.html', lang)
     

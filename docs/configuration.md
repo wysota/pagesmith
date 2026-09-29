@@ -49,18 +49,7 @@ taxonomies:
 pages:
   index:
     template: "index.html"
-    nav_name: "HOME"
-    content_files: [hero.md, services.md, about.md, skills.md]
-  services:
-    template: "page.html"
-    nav_name: "SERVICES"
-    markdown: "services.md"
-    section: true
-  contact:
-    template: "page.html"
-    nav_name: "CONTACT"
-    markdown: "contact.md"
-    section: true
+    content_files: [index.md]
 ```
 
 ### `site`
@@ -125,8 +114,7 @@ with `section: true` is a section page.
 | Key | Description |
 |---|---|
 | `template` | Template to render (normally `index.html`). |
-| `nav_name` | Label used when building navigation. |
-| `content_files` | The homepage section files (see [Site Structure](site-structure.md#contentlang)). |
+| `content_files` | Markdown files composing the homepage from `content/{lang}/` (see [Site Structure](site-structure.md#contentlang) and [Composing a page](content.md#composing-a-page-from-multiple-markdown-files)). |
 
 **Section page**
 

@@ -119,7 +119,12 @@ class TestExtractHeroParts(unittest.TestCase):
 
     def test_two_lines(self):
         hero = self.parser.extract_hero_parts("# Title\n\nSubtitle text\n\nRest")
-        self.assertEqual(hero['title'], '# Title')
+        self.assertEqual(hero['title'], 'Title')
+        self.assertEqual(hero['subtitle'], 'Subtitle text')
+
+    def test_two_lines_without_heading(self):
+        hero = self.parser.extract_hero_parts("Title\n\nSubtitle text\n\nRest")
+        self.assertEqual(hero['title'], 'Title')
         self.assertEqual(hero['subtitle'], 'Subtitle text')
 
     def test_single_line(self):

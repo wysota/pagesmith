@@ -16,8 +16,8 @@ Shared templates:
 
 ```text
 templates/
-├── base.html               # Layout: <head>, nav, footer, theme toggle
-├── index.html              # Homepage
+├── base.html               # Layout: <head>, main content block, footer
+├── index.html              # Homepage (title + content; classic sections optional)
 ├── page.html               # Section and child pages
 ├── post.html               # A single blog post
 ├── blog.html               # Paginated post archive
@@ -32,7 +32,10 @@ templates/
     └── children.html
 ```
 
-`base.html` defines a `title` block, a `head` block, and a `content` block.
+`base.html` defines a `title` block, a `head` block, and a `content` block. It
+includes only the footer; the navigation and theme toggle are not rendered by
+default. Sites that want them include `partials/nav.html` (and a theme toggle) in
+their own `base.html` override — see `sites/hero-example/templates/base.html`.
 
 ## Standard context
 

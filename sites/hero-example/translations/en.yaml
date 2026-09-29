@@ -1,0 +1,28 @@
+nav:
+  home: Home
+  services: Services
+  about: About
+  contact: Contact
+  blog: Blog
+footer:
+  copyright: All rights reserved.
+ui:
+  get_started: Get Started
+  our_services: What We Offer
+  about_us: About Us
+  technical_expertise: Expertise
+  lets_work_together: Get in Touch
+  contact_cta: Have a project in mind? Get in touch.
+  read_more: Read more
+  related_pages: Related Pages
+  previous_page: Previous
+  next_page: Next
+  no_posts: No posts yet.
+taxonomy:
+  all_tags: All Tags
+  all_categories: All Categories
+  tagged_with: Posts tagged with
+  in_category: Posts in category
+  tags: Tags
+  categories: Categories
+  no_terms: No terms yet.

@@ -1,0 +1,4 @@
+linker_options:
+  link_class: code-link
+  skip_existing_links: true
+  verbose: false

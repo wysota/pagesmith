@@ -8,7 +8,7 @@ mysite/
 ├── config/
 │   ├── site.yaml            # Required: languages, pages, build settings
 │   └── link_schemes.yaml    # Optional: code-linking rules
-├── content/{lang}/          # Homepage sections (hero, services, about, skills)
+├── content/{lang}/          # Homepage source file(s); compose a page from several files
 ├── sections/{lang}/         # Standalone pages; subdirectories become child pages
 ├── posts/{lang}/            # Dated blog posts (YYYY-MM-DD-slug.md)
 ├── drafts/{lang}/           # Draft pages (never built; created by `draft`)
@@ -30,21 +30,13 @@ mysite/
 
 ## `content/{lang}/`
 
-Homepage section files consumed by the `index` page. The shared template reads
-four files:
+Homepage source files consumed by the `index` page. The default site ships a
+single file, `content/en/index.md` — its first `# Heading` is the page title and
+the body is rendered into the main content area.
 
-| File | Used for |
-|---|---|
-| `hero.md` | Headline (first line) and tagline (second line) |
-| `services.md` | "What we offer" cards |
-| `about.md` | About paragraph(s) and an expertise list |
-| `skills.md` | Expertise cards |
-
-Cards use one line per card:
-
-```markdown
-- **Card Title**: Card description.
-```
+The index page can also be composed from several files, each feeding a named part
+of the layout (hero, cards, about, …). See
+[Composing a page from multiple Markdown files](content.md#composing-a-page-from-multiple-markdown-files).
 
 ## `sections/{lang}/`
 

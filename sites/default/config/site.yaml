@@ -1,0 +1,24 @@
+site:
+  name: Default
+  base_url: https://default.example.com
+languages:
+  en:
+    name: English
+    code: en
+    default: true
+taxonomies:
+  tags:
+    singular: tag
+    plural: tags
+    slug: tags
+    enabled: false
+  categories:
+    singular: category
+    plural: categories
+    slug: categories
+    enabled: false
+pages:
+  index:
+    template: index.html
+    content_files:
+    - index.md

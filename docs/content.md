@@ -39,35 +39,71 @@ Custom fields are allowed and are available to templates as `{{ metadata.field }
 The opening `---` must be on line 1; both separators are required. If frontmatter
 is absent, the title is taken from the first `# Heading` line.
 
-## Homepage sections
+## Homepage
 
-The `index` page reads four files from `content/{lang}/`:
+The `index` page is composed from Markdown files in `content/{lang}/` listed
+under `pages.index.content_files` in `site.yaml`. The default site uses a single
+file:
 
-**`hero.md`** — title and subtitle only:
+```yaml
+pages:
+  index:
+    template: index.html
+    content_files: [index.md]
+```
 
 ```markdown
 # My Site
-Building great things since 2026.
+
+This is the homepage. Edit `content/en/index.md` to change this page.
 ```
 
-**`services.md` / `skills.md`** — cards, exactly `- **Title**: Description`:
+The first `# Heading` (or `title:` frontmatter) becomes the page title; the rest
+of the Markdown body is rendered into the main content area.
 
-```markdown
-- **Consulting**: Architecture reviews and technical guidance.
-- **Development**: Building the thing.
+### Composing a page from multiple Markdown files
+
+A page can assemble any number of Markdown files, each dictating a different part
+of the layout. Two config forms are supported.
+
+**Plain strings** use the classic name → format convention: `hero.md` renders a
+hero, `services.md` / `skills.md` render cards, `about.md` renders an about
+block, and any other file renders as full Markdown:
+
+```yaml
+pages:
+  index:
+    template: index.html
+    content_files: [hero.md, services.md, about.md, skills.md]
 ```
 
-**`about.md`** — first line is the title, paragraphs become body text, and
-bullet items become an expertise list:
+**Explicit mapping** names each section and its format:
 
-```markdown
-# About Us
-
-We have been building sites for years.
-
-- Software architecture
-- Performance engineering
+```yaml
+pages:
+  index:
+    template: index.html
+    content_files:
+      hero:     {file: hero.md,     format: hero}
+      services: {file: services.md, format: cards}
+      about:    {file: about.md,    format: about}
+      skills:   {file: skills.md,   format: cards}
 ```
+
+Each section is exposed to the template under its name. The formats:
+
+| Format | Markdown source | Template variable |
+|---|---|---|
+| `markdown` (default) | Any body | HTML string. The first such file also sets `page.title` and `page.content`. |
+| `hero` | Title line (a leading `#` is stripped) + subtitle line | dict `{title, subtitle}` |
+| `cards` | `- **Title**: Description` lines | list of `{title, description}` |
+| `about` | Paragraphs + `- ` bullets | dict `{content, expertise}` |
+
+The shared `index.html` template renders the classic section names (`hero`,
+`services`, `about`, `skills`). Other section names — or an entirely different
+layout — use a per-site template override (see [Templates](templates.md)). The
+repository ships a runnable hero-composed example at `sites/hero-example/`
+(build it with `make build SITE=hero-example`).
 
 ## Standalone pages
 

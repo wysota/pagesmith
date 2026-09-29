@@ -157,7 +157,10 @@ class ContentParser:
     def extract_hero_parts(self, markdown_text: str) -> Dict[str, str]:
         """
         Extract title and subtitle from hero markdown.
-        
+
+        The first non-empty line is the title (a leading Markdown heading
+        marker like ``# `` is stripped); the second is the subtitle.
+
         Args:
             markdown_text: The hero markdown content
             
@@ -171,6 +174,8 @@ class ContentParser:
         for line in lines:
             line = line.strip()
             if line and not title:
+                if line.startswith('#'):
+                    line = re.sub(r'^#+\s*', '', line).strip()
                 title = line
             elif line and title and not subtitle:
                 subtitle = line

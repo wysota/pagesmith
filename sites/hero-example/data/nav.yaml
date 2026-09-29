@@ -1,0 +1,14 @@
+# Navigation items for this site.
+#
+# Rendered by templates/partials/nav.html via partials/nav-item.html.
+# Per item:
+#   - name:  URL key; also the default label key under t.nav.<name> and the
+#            current_page value used for the active state.
+#   - label: optional dot-path into translations, overriding the default
+#            t.nav.<name> label (e.g. taxonomy.tags).
+# Order in this file is the order shown in the navigation.
+items:
+  - name: home
+  - name: about
+  - name: tags
+    label: taxonomy.tags

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="{{ lang.code }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ page.title }}{% endblock %} - {{ site.name }}</title>
+    {% block head %}{% endblock %}
+    <link rel="icon" href="{{ urls.assets }}/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ urls.assets }}/css/style.css">
+    <!-- CSS previously inlined here - now in assets/css/style.css -->
+    <style>
+        /* All styles have been moved to external assets/css/style.css */
+    </style>
+    <script>
+        // Theme initialization - runs immediately to avoid FOUC
+        (function() {
+            const root = document.documentElement;
+            const themeKey = 'theme';
+            
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    root.setAttribute('data-theme', 'dark');
+                } else if (theme === 'light') {
+                    root.setAttribute('data-theme', 'light');
+                } else {
+                    root.removeAttribute('data-theme');
+                }
+            }
+            
+            const stored = localStorage.getItem(themeKey);
+            if (stored === 'dark' || stored === 'light') {
+                applyTheme(stored);
+            } else {
+                applyTheme('auto');
+            }
+        })();
+    </script>
+</head>
+<body>
+    {% include "partials/nav.html" %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "partials/footer.html" %}
+    
+    <script src="{{ urls.assets }}/js/main.js"></script>
+    
+    <script>
+        // Theme toggle functionality - cycles dark → light → auto → dark
+        const themeToggle = document.querySelector('.theme-toggle');
+        const root = document.documentElement;
+        const themeKey = 'theme';
+        
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                const current = root.getAttribute('data-theme');
+                let next, stored;
+                
+                if (current === 'dark') {
+                    next = 'light';
+                    stored = 'light';
+                } else if (current === 'light') {
+                    next = null;
+                    stored = 'auto';
+                } else {
+                    next = 'dark';
+                    stored = 'dark';
+                }
+                
+                if (next) {
+                    root.setAttribute('data-theme', next);
+                } else {
+                    root.removeAttribute('data-theme');
+                }
+                localStorage.setItem(themeKey, stored);
+            });
+        }
+        
+        // System theme changes are handled automatically by CSS in auto mode
+    </script>
+</body>
+</html>

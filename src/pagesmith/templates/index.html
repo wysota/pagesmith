@@ -1,14 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}{{ hero.title }}{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
+<!-- Hero / main content section -->
 <section class="hero">
     <div class="container">
-        <h1>{{ hero.title }}</h1>
-        {% if hero.subtitle %}<p class="subtitle">{{ hero.subtitle }}</p>{% endif %}
-        <a class="button" href="{{ urls.contact }}">{{ t.ui.get_started }}</a>
+        <h1>{{ page.title }}</h1>
+        {% if hero %}
+            {% if hero.subtitle %}<p class="subtitle">{{ hero.subtitle }}</p>{% endif %}
+            {% if urls.get('contact') %}
+            <a class="button" href="{{ urls.contact }}">{{ t.ui.get_started | default('Get Started') }}</a>
+            {% endif %}
+        {% endif %}
+        {% if page.content %}
+        <div class="page-content">{{ page.content | safe }}</div>
+        {% endif %}
     </div>
 </section>
 
@@ -16,7 +23,7 @@
 {% if services %}
 <section id="services">
     <div class="container">
-        <h2>{{ t.ui.our_services }}</h2>
+        <h2>{{ t.ui.our_services | default('What We Offer') }}</h2>
         <div class="services-grid">
             {% for service in services %}
             {% include "partials/service-card.html" %}
@@ -27,10 +34,10 @@
 {% endif %}
 
 <!-- About Section -->
-{% if about.content %}
+{% if about and about.content %}
 <section id="about">
     <div class="container">
-        <h2>{{ t.ui.about_us }}</h2>
+        <h2>{{ t.ui.about_us | default('About Us') }}</h2>
         <div class="about-content">
             <div class="about-text">
                 {{ about.content | safe }}
@@ -51,7 +58,7 @@
 {% if skills %}
 <section id="skills">
     <div class="container">
-        <h2>{{ t.ui.technical_expertise }}</h2>
+        <h2>{{ t.ui.technical_expertise | default('Expertise') }}</h2>
         <div class="skills-content">
             {% for skill in skills %}
             {% include "partials/skill-item.html" %}
@@ -61,12 +68,14 @@
 </section>
 {% endif %}
 
-<!-- Contact Section -->
+<!-- Contact Section (hero landing pages with a contact page) -->
+{% if hero and urls.get('contact') %}
 <section id="contact">
     <div class="container">
-        <h2>{{ t.ui.lets_work_together }}</h2>
+        <h2>{{ t.ui.lets_work_together | default('Get in Touch') }}</h2>
         {% if t.ui.contact_cta %}<p>{{ t.ui.contact_cta }}</p>{% endif %}
-        <a class="button" href="{{ urls.contact }}">{{ t.nav.contact }}</a>
+        <a class="button" href="{{ urls.contact }}">{{ t.nav.contact | default('Contact') }}</a>
     </div>
 </section>
+{% endif %}
 {% endblock %}

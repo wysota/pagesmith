@@ -1,0 +1,50 @@
+site:
+  name: Example
+  base_url: https://example.example.com
+languages:
+  en:
+    name: English
+    code: en
+    default: true
+build:
+  content_dir: content
+  sections_dir: sections
+  images_dir: images
+  permalink: posts/:slug
+  paginate: true
+  posts_per_page: 5
+taxonomies:
+  tags:
+    singular: tag
+    plural: tags
+    slug: tags
+    enabled: true
+  categories:
+    singular: category
+    plural: categories
+    slug: categories
+    enabled: true
+pages:
+  index:
+    template: index.html
+    nav_name: HOME
+    content_files:
+    - hero.md
+    - services.md
+    - about.md
+    - skills.md
+  services:
+    template: page.html
+    nav_name: SERVICES
+    markdown: services.md
+    section: true
+  about:
+    template: page.html
+    nav_name: ABOUT
+    markdown: about.md
+    section: true
+  contact:
+    template: page.html
+    nav_name: CONTACT
+    markdown: contact.md
+    section: true
