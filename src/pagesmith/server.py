@@ -13,7 +13,30 @@ logger = logging.getLogger(__name__)
 
 try:
     from livereload import Server
+    from tornado import web
+
     LIVERELOAD_AVAILABLE = True
+
+    class HealthHandler(web.RequestHandler):
+        """Answer /health with 200 so health checks stop hitting 404s."""
+        def get(self):
+            self.set_header('Content-Type', 'text/plain; charset=utf-8')
+            self.write('ok')
+
+        def head(self):
+            self.set_header('Content-Type', 'text/plain; charset=utf-8')
+            self.finish()
+
+    class HealthAwareServer(Server):
+        """livereload Server that also serves a /health endpoint.
+
+        Tornado matches routes in order, so the /health route must come
+        before the static-file catch-all registered by get_web_handlers.
+        """
+        def get_web_handlers(self, script):
+            handlers = super().get_web_handlers(script)
+            return [(r'/health/?$', HealthHandler)] + handlers
+
 except ImportError:
     LIVERELOAD_AVAILABLE = False
 
@@ -38,7 +61,7 @@ def serve(site_dir, output_dir, host='0.0.0.0', port=8000, debug=False):
             except Exception:
                 logger.exception("[Live Reload] Build error")
 
-        server = Server()
+        server = HealthAwareServer() if hasattr(Server, 'get_web_handlers') else Server()
 
         watch_dirs = [
             package_templates_dir(),

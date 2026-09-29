@@ -19,8 +19,9 @@
 | Card not appearing on the homepage | Cards must be exactly `- **Title**: Description` in `content/{lang}/*.md`. |
 | `UndefinedError` in a template | A referenced translation key or variable is missing; add it to `translations/{lang}.yaml` or guard with `{% if %}`. |
 | Taxonomy pages not generated | Posts need `tags`/`categories` frontmatter and must not be drafts. |
-| `watch` says watchdog is required | `pip install 'pagesmith[watch]'`. |
-| Live reload not working | `pip install 'pagesmith[serve]'`; otherwise `serve` falls back to a plain server. |
+| `watch` says watchdog is required | `uv tool install 'pagesmith[watch]'` (or `pip install 'pagesmith[watch]'`). |
+| Live reload not working | `uv tool install 'pagesmith[serve]'` (or `pip install 'pagesmith[serve]'`); otherwise `serve` falls back to a plain server. |
+| Repeated `404 GET /health` in `serve` logs | An external probe (monitor, proxy, container healthcheck) is polling the dev server. It expects a `/health` endpoint, so the server answers it with `200 OK` — this is normal and intentional, not a missing page. |
 
 ## Inspecting a site
 
@@ -56,10 +57,10 @@ The Mermaid cache can also be cleared safely by deleting
 
 ## Documentation build
 
-To build this documentation locally:
+To build this documentation locally from a checkout (inside the project `.venv`):
 
 ```bash
-pip install 'pagesmith[docs]'
+uv pip install '.[docs]'
 mkdocs serve     # live preview at http://127.0.0.1:8000
 mkdocs build     # writes ./site/
 ```
