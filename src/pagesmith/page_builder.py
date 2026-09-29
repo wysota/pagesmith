@@ -132,8 +132,11 @@ class PageBuilder:
         # Determine output path
         path_segments = f'sections/{page_name}.html'
         
-        # Update taxonomy data with page reference and URL
-        page_url_from_taxonomy = f'../../sections/{page_name}.html' if lang != self.site_builder.default_lang else f'sections/{page_name}.html'
+        # Update taxonomy data with page reference and URL.
+        # A taxonomy term page lives two levels below the language root
+        # (tags/{term}/), so the URL back to a section page is the same for
+        # the default and non-default languages.
+        page_url_from_taxonomy = f'../../sections/{page_name}.html'
         self.site_builder._add_taxonomy_post(metadata, lang, {
             'title': metadata.get('title', page_title),
             'subtitle': subtitle_html,
@@ -305,7 +308,7 @@ class PageBuilder:
             # non-default languages (html/tags/{term}/ -> html/; or
             # html/{lang}/tags/{term}/ -> html/{lang}/).
             relative_prefix = '../../'
-            page_url_from_taxonomy = f'{relative_prefix}/{"/".join(output_segments)}'
+            page_url_from_taxonomy = f'{relative_prefix}{"/".join(output_segments)}'
             
             self.site_builder._add_taxonomy_post(metadata, lang, {
                 'title': metadata.get('title', child_title),
